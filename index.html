@@ -36,23 +36,23 @@
                                             </div>
                                         </li>
                                         <li>
-                                            <label>Show Rates</label>
-                                            <div class="switch">
-                                                <label>
-                                                    No
-                                                    <input type="checkbox" v-model="showRates">
-                                                    <span class="lever"></span>
-                                                    Yes
-                                                </label>
-                                            </div>
-                                        </dd>
-                                        <li>
                                             <label>Show Savings</label>
                                             <div class="switch">
                                                 <label>
                                                     No
                                                     <input type="checkbox" v-model="showSavings"
                                                         v-bind:disabled="!enableFlywire">
+                                                    <span class="lever"></span>
+                                                    Yes
+                                                </label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <label>Show Rates</label>
+                                            <div class="switch">
+                                                <label>
+                                                    No
+                                                    <input type="checkbox" v-model="showRates">
                                                     <span class="lever"></span>
                                                     Yes
                                                 </label>
