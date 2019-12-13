@@ -540,7 +540,7 @@
                 </div>
             </div>
         </div>
-        <div class="fixed-action-btn">
+        <div class="fixed-action-btn" v-if="!readOnly">
                 <a class="btn-floating btn-large waves-effect waves-light blue lighten-1"
                     v-on:click="showFlywireConfig = false; showCurrentConfig = !showCurrentConfig">
                     <i class="material-icons">settings</i>

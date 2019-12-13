@@ -4,6 +4,7 @@ var vm = new Vue({
     data: {
         ccys: currencies,
 
+        readOnly: false,
         showCurrentConfig: false,
         showFlywireConfig: false,
 
@@ -178,6 +179,8 @@ var vm = new Vue({
     },
     methods: {
         load: function () {
+            this.readOnly =    parseInt(this.getQueryStringValue('ro') || '0') == 1;
+
             this.enableFlywire =    parseInt(this.getQueryStringValue('ef') || '0') == 1;
             this.showRates =        parseInt(this.getQueryStringValue('sr') || '0') == 1;
             this.showSavings =      parseInt(this.getQueryStringValue('ss') || '0') == 1;
