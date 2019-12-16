@@ -9,8 +9,8 @@ var vm = new Vue({
         showFlywireConfig: false,
 
         enableFlywire: false,
-        showRates: false,
-        showSavings: false,
+        showRates: true,
+        showSavings: true,
         condensedView: false,
         growthRaw: 1,
 
@@ -182,8 +182,8 @@ var vm = new Vue({
             this.readOnly =    parseInt(this.getQueryStringValue('ro') || '0') == 1;
 
             this.enableFlywire =    parseInt(this.getQueryStringValue('ef') || '0') == 1;
-            this.showRates =        parseInt(this.getQueryStringValue('sr') || '0') == 1;
-            this.showSavings =      parseInt(this.getQueryStringValue('ss') || '0') == 1;
+            this.showRates =        parseInt(this.getQueryStringValue('sr') || '1') == 1;
+            this.showSavings =      parseInt(this.getQueryStringValue('ss') || '1') == 1;
             this.condensedView =    parseInt(this.getQueryStringValue('cv') || '0') == 1;
             this.growthRaw =        parseFloat(this.getQueryStringValue('g') || '1');
 
