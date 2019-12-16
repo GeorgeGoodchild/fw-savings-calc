@@ -34,7 +34,7 @@ var vm = new Vue({
         flywireMerchantCardPerTransactionAmount: 0,
         flywireMerchantWirePerTransactionAmount: 0,
         flywireNumberOfDisbursements: 52,
-        flywireMerchantDisbursementAmount: 5,
+        flywireMerchantDisbursementAmount: 0,
 
         flywirePayerWirePerTransactionAmount: 0,
     },
@@ -207,7 +207,7 @@ var vm = new Vue({
             this.flywireMerchantCardPerTransactionAmount = parseFloat(this.getQueryStringValue('fmcpta') || '0');
             this.flywireMerchantWirePerTransactionAmount = parseFloat(this.getQueryStringValue('fmwpta') || '0');
             this.flywireNumberOfDisbursements =            parseInt(this.getQueryStringValue('fnod') || '52');
-            this.flywireMerchantDisbursementAmount =       parseFloat(this.getQueryStringValue('fmda') || '5');
+            this.flywireMerchantDisbursementAmount =       parseFloat(this.getQueryStringValue('fmda') || '0');
 
             this.flywirePayerWirePerTransactionAmount =    parseFloat(this.getQueryStringValue('fpwpta') || '0');
 
@@ -300,7 +300,7 @@ var vm = new Vue({
                     val = val / 1000000;
                     suffix = 'M'
                 }
-                else if (val > 10000) {
+                else if (val >= 10000) {
                     val = val / 1000;
                     suffix = 'k';
                 } 

@@ -25,7 +25,7 @@
                                     <img src="assets/flywire-logo.svg" />
                                     <ul>
                                         <li>
-                                            <label>Enable Flywire</label>
+                                            <label>Using Flywire</label>
                                             <div class="switch">
                                                 <label>
                                                     No
@@ -72,56 +72,74 @@
                                         <li>
                                             <label>Card:Wire Split</label>
                                             <div>
-                                                <input id="percentWire" type="range" v-model="percentWire" 
-                                                    min="0" max="1" step="0.01" />
+                                                <input id="percentWire" type="range" v-model="percentWire" min="0"
+                                                    max="1" step="0.01" />
                                             </div>
                                         </li>
                                         <li>
                                             <label>Merch:Payer Split</label>
                                             <div>
                                                 <input id="flywirePercentMerchant" type="range"
-                                                    v-model="flywirePercentPayer" v-bind:disabled="!enableFlywire" 
+                                                    v-model="flywirePercentPayer" v-bind:disabled="!enableFlywire"
                                                     min="0" max="1" step="0.01" />
                                             </div>
                                         </li>
                                         <li>
                                             <label>Growth ({{growth}}x)</label>
                                             <div>
-                                                <input id="growthRaw" type="range" v-model="growthRaw" min="1"
-                                                    max="10" step="0.25" />
+                                                <input id="growthRaw" type="range" v-model="growthRaw" min="1" max="10"
+                                                    step="0.25" />
                                             </div>
                                         </li>
-                                    </dl>
+                                        </dl>
                                 </div>
-
-                                <div class="payer">
+                                <div class="merchant">
                                     <div>
-                                        <i class="material-icons medium">public</i>
+                                        {{ merchantName }}
                                     </div>
                                     <div>
-                                        <span class="total">{{ amount | currency(ccy.symbol, condensedView) }}</span>
+                                        <i class="material-icons medium">business</i>
+                                    </div>
+                                    <div class="slide-down amount">
+                                        <div v-bind:class="{ show: !enableFlywire }">
+                                            <span class="content">
+                                                Recieve
+                                            </span>
+                                            <span
+                                                class="total">{{ currentMerchantAmountReceived | currency(ccy.symbol, condensedView)}}
+                                            </span>
+                                        </div>
+                                        <div v-bind:class="{ show: enableFlywire }">
+                                            <span class="content">
+                                                Recieve
+                                            </span>
+                                            <span class="total"
+                                                v-bind:class="{ ftw: flywireMerchantAmountReceived > currentMerchantAmountReceived }">{{ flywireMerchantAmountReceived | currency(ccy.symbol, condensedView)}}</span>
+                                        </div>
                                     </div>
                                     <div class="slide-down fees-total">
                                         <div v-bind:class="{ show: !enableFlywire }">
-                                            <span>(inc. fees {{ currentPayerAmountSent | currency(ccy.symbol, condensedView) }})</span>
+                                            <span>({{ amount | currency(ccy.symbol, condensedView) }} billed less
+                                                {{ currentMerchantFees | currency(ccy.symbol, condensedView)}}
+                                                merchant fees)
+                                            </span>
                                         </div>
                                         <div v-bind:class="{ show: enableFlywire }">
-                                            <span>
-                                                (inc. fees
-                                                <span v-bind:class="{ ftw: flywirePayerAmountSent < currentPayerAmountSent }">
-                                                    {{ flywirePayerAmountSent | currency(ccy.symbol, condensedView) }}
-                                                </span>
-                                                )
+                                            <span>({{ amount | currency(ccy.symbol, condensedView) }} billed less <span
+                                                    v-bind:class="{ ftw: flywireMerchantFees < currentMerchantFees }">{{ flywireMerchantFees | currency(ccy.symbol, condensedView)}}</span>
+                                                merchant fees</span>
+                                            <span v-if="flywireDisbursementFees > 0">
+                                                &amp;
+                                                <span>{{ flywireDisbursementFees | currency(ccy.symbol, condensedView)}}</span>
+                                                <span>disbursement fees</span>
                                             </span>
+                                            <span>)</span>
                                         </div>
                                     </div>
                                     <div class="slide-down saving">
                                         <div v-bind:class="{ show: (enableFlywire && showSavings) }">
-                                            <span>saving
-                                                <span v-bind:class="{ ftw: flywirePayerAmountSent < currentPayerAmountSent }">
-                                                    {{ flywirePayerSaving | currency(ccy.symbol, condensedView) }}
-                                                </span>
-                                            </span>
+                                            <span>saving <span
+                                                    v-bind:class="{ ftw: flywireMerchantAmountReceived > currentMerchantAmountReceived }">{{ flywireMerchantSaving | currency(ccy.symbol, condensedView) }}</span></span>
                                         </div>
                                     </div>
                                 </div>
@@ -140,7 +158,8 @@
                                             </div>
                                             <div v-bind:class="{ show: enableFlywire }">
                                                 <div>Total Card Fees</div>
-                                                <div class="sub-total" v-bind:class="{ ftw: flywireTotalCardFees < currentTotalCardFees }">
+                                                <div class="sub-total"
+                                                    v-bind:class="{ ftw: flywireTotalCardFees < currentTotalCardFees }">
                                                     {{ flywireTotalCardFees | currency(ccy.symbol, condensedView)}}
                                                 </div>
                                             </div>
@@ -149,20 +168,23 @@
                                             <div class="slide-down fees">
                                                 <div v-bind:class="{ show: !enableFlywire }">
                                                     <span class="sub-total">
-                                                        {{ currentPayerCardFees | currency(ccy.symbol, condensedView)}}
+                                                        {{ currentMerchantCardFees | currency(ccy.symbol, condensedView)}}
                                                     </span>
-                                                    <span>issuer & FX fees</span>
+                                                    <span>merch't fees</span>
                                                     <span class="rates" v-if="showRates">
-                                                        @ {{ currentPayerCardRate | percent }}
+                                                        @ {{ currentMerchantCardRate | percent }} +
+                                                        {{ currentMerchantCardPerTransactionAmount | currency(ccy.symbol, condensedView) }}
+                                                        p/tran
                                                     </span>
                                                 </div>
                                                 <div v-bind:class="{ show: enableFlywire }">
-                                                    <span class="sub-total" v-bind:class="{ ftw: flywirePayerCardFees < currentPayerCardFees }">
-                                                        {{ flywirePayerCardFees | currency(ccy.symbol, condensedView)}}
-                                                    </span>
-                                                    <span>payer fees</span>
+                                                    <span class="sub-total"
+                                                        v-bind:class="{ ftw: flywireMerchantCardFees < currentMerchantCardFees }">{{ flywireMerchantCardFees | currency(ccy.symbol, condensedView)}}</span>
+                                                    <span>merch't fees</span>
                                                     <span class="rates" v-if="showRates">
-                                                        @ {{ flywirePayerCardRate | percent }}
+                                                        @ {{ flywireMerchantCardRate | percent }} +
+                                                        {{ flywireMerchantCardPerTransactionAmount | currency(ccy.symbol, condensedView) }}
+                                                        p/tran
                                                     </span>
                                                 </div>
                                             </div>
@@ -180,23 +202,21 @@
                                             <div class="slide-down fees">
                                                 <div v-bind:class="{ show: !enableFlywire }">
                                                     <span class="sub-total">
-                                                        {{ currentMerchantCardFees | currency(ccy.symbol, condensedView)}}
+                                                        {{ currentPayerCardFees | currency(ccy.symbol, condensedView)}}
                                                     </span>
-                                                    <span>merch't fees</span>
+                                                    <span>issuer & FX fees</span>
                                                     <span class="rates" v-if="showRates">
-                                                        @ {{ currentMerchantCardRate | percent }} +
-                                                        {{ currentMerchantCardPerTransactionAmount | currency(ccy.symbol, condensedView) }}
-                                                        p/tran
+                                                        @ {{ currentPayerCardRate | percent }}
                                                     </span>
                                                 </div>
                                                 <div v-bind:class="{ show: enableFlywire }">
                                                     <span class="sub-total"
-                                                        v-bind:class="{ ftw: flywireMerchantCardFees < currentMerchantCardFees }">{{ flywireMerchantCardFees | currency(ccy.symbol, condensedView)}}</span>
-                                                    <span>client fees</span>
+                                                        v-bind:class="{ ftw: flywirePayerCardFees < currentPayerCardFees }">
+                                                        {{ flywirePayerCardFees | currency(ccy.symbol, condensedView)}}
+                                                    </span>
+                                                    <span>payer fees</span>
                                                     <span class="rates" v-if="showRates">
-                                                        @ {{ flywireMerchantCardRate | percent }} +
-                                                        {{ flywireMerchantCardPerTransactionAmount | currency(ccy.symbol, condensedView) }} 
-                                                        p/tran
+                                                        @ {{ flywirePayerCardRate | percent }}
                                                     </span>
                                                 </div>
                                             </div>
@@ -207,23 +227,24 @@
                                             <div class="slide-down fees">
                                                 <div v-bind:class="{ show: !enableFlywire }">
                                                     <span class="sub-total">
-                                                        {{ currentPayerWireFees | currency(ccy.symbol, condensedView)}}
+                                                        {{ currentMerchantWireFees | currency(ccy.symbol, condensedView)}}
                                                     </span>
-                                                    <span>sending fees</span>
+                                                    <span>receiving fees</span>
                                                     <span class="rates" v-if="showRates">
-                                                        @ {{ currentPayerWireRate | percent }} +
-                                                        {{ currentPayerWirePerTransactionAmount | currency(ccy.symbol, condensedView) }}
+                                                        @
+                                                        {{ currentMerchantWirePerTransactionAmount | currency(ccy.symbol, condensedView) }}
                                                         p/tran
                                                     </span>
                                                 </div>
                                                 <div v-bind:class="{ show: enableFlywire }">
-                                                    <span class="sub-total" v-bind:class="{ ftw: flywirePayerWireFees < currentPayerWireFees }">
-                                                        {{ flywirePayerWireFees | currency(ccy.symbol, condensedView)}}
+                                                    <span class="sub-total"
+                                                        v-bind:class="{ ftw: flywireMerchantWireFees < currentMerchantWireFees }">
+                                                        {{ flywireMerchantWireFees | currency(ccy.symbol, condensedView)}}
                                                     </span>
-                                                    <span>sending fees</span>
+                                                    <span>receiving fees</span>
                                                     <span class="rates" v-if="showRates">
-                                                        @ {{ flywirePayerWireRate | percent }} +
-                                                        {{ flywirePayerWirePerTransactionAmount | currency(ccy.symbol, condensedView) }}
+                                                        @ {{ flywireMerchantWireRate | percent }} +
+                                                        {{ flywireMerchantWirePerTransactionAmount | currency(ccy.symbol, condensedView) }}
                                                         p/tran
                                                     </span>
                                                 </div>
@@ -242,22 +263,24 @@
                                             <div class="slide-down fees">
                                                 <div v-bind:class="{ show: !enableFlywire }">
                                                     <span class="sub-total">
-                                                        {{ currentMerchantWireFees | currency(ccy.symbol, condensedView)}}
+                                                        {{ currentPayerWireFees | currency(ccy.symbol, condensedView)}}
                                                     </span>
-                                                    <span>receiving fees</span>
+                                                    <span>sending fees</span>
                                                     <span class="rates" v-if="showRates">
-                                                        @ {{ currentMerchantWirePerTransactionAmount | currency(ccy.symbol, condensedView) }}
+                                                        @ {{ currentPayerWireRate | percent }} +
+                                                        {{ currentPayerWirePerTransactionAmount | currency(ccy.symbol, condensedView) }}
                                                         p/tran
                                                     </span>
                                                 </div>
                                                 <div v-bind:class="{ show: enableFlywire }">
-                                                    <span class="sub-total" v-bind:class="{ ftw: flywireMerchantWireFees < currentMerchantWireFees }">
-                                                        {{ flywireMerchantWireFees | currency(ccy.symbol, condensedView)}}
+                                                    <span class="sub-total"
+                                                        v-bind:class="{ ftw: flywirePayerWireFees < currentPayerWireFees }">
+                                                        {{ flywirePayerWireFees | currency(ccy.symbol, condensedView)}}
                                                     </span>
-                                                    <span>receiving fees</span>
+                                                    <span>sending fees</span>
                                                     <span class="rates" v-if="showRates">
-                                                        @ {{ flywireMerchantWireRate | percent }} +
-                                                        {{ flywireMerchantWirePerTransactionAmount | currency(ccy.symbol, condensedView) }}
+                                                        @ {{ flywirePayerWireRate | percent }} +
+                                                        {{ flywirePayerWirePerTransactionAmount | currency(ccy.symbol, condensedView) }}
                                                         p/tran
                                                     </span>
                                                 </div>
@@ -272,7 +295,8 @@
                                             </div>
                                             <div v-bind:class="{ show: enableFlywire }">
                                                 <div>Total Wire Fees</div>
-                                                <div class="sub-total" v-bind:class="{ ftw: flywireTotalWireFees < currentTotalWireFees }">
+                                                <div class="sub-total"
+                                                    v-bind:class="{ ftw: flywireTotalWireFees < currentTotalWireFees }">
                                                     {{ flywireTotalWireFees | currency(ccy.symbol, condensedView)}}
                                                 </div>
                                             </div>
@@ -283,43 +307,52 @@
                                     <div class="right-to-left"></div>
                                     <div class="left-to-right"></div>
                                 </div>
-                                <div class="merchant">
-                                    <div class="slide-down fees-total">
-                                        <div v-bind:class="{ show: !enableFlywire }">
-                                            <span>(less fees of
-                                                {{ currentMerchantFees | currency(ccy.symbol, condensedView)}})</span>
-                                        </div>
-                                        <div v-bind:class="{ show: enableFlywire }">
-                                            <span>(less <span
-                                                    v-bind:class="{ ftw: flywireMerchantFees < currentMerchantFees }">{{ flywireMerchantFees | currency(ccy.symbol, condensedView)}}</span>
-                                                merchant fees</span>
-                                            &amp;
-                                            <span>{{ flywireDisbursementFees | currency(ccy.symbol, condensedView)}}</span>
-                                            <span>disbursement fees)</span>
-                                        </div>
+                                <div class="payer">
+                                    <div>
+                                        <i class="material-icons medium">people_outline</i>
                                     </div>
                                     <div class="slide-down amount">
                                         <div v-bind:class="{ show: !enableFlywire }">
+                                            <span class="content">
+                                                Send
+                                            </span>
                                             <span
-                                                class="total">{{ currentMerchantAmountReceived | currency(ccy.symbol, condensedView)}}</span>
+                                                class="total">{{ currentPayerAmountSent | currency(ccy.symbol, condensedView)}}
+                                            </span>
                                         </div>
                                         <div v-bind:class="{ show: enableFlywire }">
+                                            <span class="content">
+                                                Send
+                                            </span>
                                             <span class="total"
-                                                v-bind:class="{ ftw: flywireMerchantAmountReceived > currentMerchantAmountReceived }">{{ flywireMerchantAmountReceived | currency(ccy.symbol, condensedView)}}</span>
+                                                v-bind:class="{ ftw: flywireMerchantAmountReceived > currentMerchantAmountReceived }">{{ flywirePayerAmountSent | currency(ccy.symbol, condensedView)}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="slide-down fees-total">
+                                        <div v-bind:class="{ show: !enableFlywire }">
+                                            <span>({{ amount | currency(ccy.symbol, condensedView) }} billed plus
+                                                {{ currentPayerFees | currency(ccy.symbol, condensedView) }} fees)</span>
+                                        </div>
+                                        <div v-bind:class="{ show: enableFlywire }">
+                                            <span>
+                                                ({{ amount | currency(ccy.symbol, condensedView) }} billed plus
+                                                <span
+                                                    v-bind:class="{ ftw: flywirePayerAmountSent < currentPayerAmountSent }">
+                                                    {{ flywirePayerFees | currency(ccy.symbol, condensedView) }}
+                                                </span>
+                                                )
+                                            </span>
                                         </div>
                                     </div>
                                     <div class="slide-down saving">
-                                        <div
-                                            v-bind:class="{ show: (enableFlywire && showSavings) }">
-                                            <span>saving <span
-                                                    v-bind:class="{ ftw: flywireMerchantAmountReceived > currentMerchantAmountReceived }">{{ flywireMerchantSaving | currency(ccy.symbol, condensedView) }}</span></span>
+                                        <div v-bind:class="{ show: (enableFlywire && showSavings) }">
+                                            <span>saving
+                                                <span
+                                                    v-bind:class="{ ftw: flywirePayerAmountSent < currentPayerAmountSent }">
+                                                    {{ flywirePayerSaving | currency(ccy.symbol, condensedView) }}
+                                                </span>
+                                            </span>
                                         </div>
-                                    </div>
-                                    <div>
-                                        <i class="material-icons medium">business</i>
-                                    </div>
-                                    <div>
-                                        {{ merchantName }}
                                     </div>
                                 </div>
                             </div>
@@ -416,7 +449,7 @@
                                 </div>
                             </div>
                             <div class="fixed-action-btn">
-                                    <a class="btn-floating btn-large waves-effect waves-light blue lighten-1"
+                                <a class="btn-floating btn-large waves-effect waves-light blue lighten-1"
                                     v-on:click="showFlywireConfig = !showFlywireConfig">
                                     <i class="material-icons">arrow_upward</i>
                                 </a>
@@ -541,27 +574,25 @@
             </div>
         </div>
         <div class="fixed-action-btn" v-if="!readOnly">
-                <a class="btn-floating btn-large waves-effect waves-light blue lighten-1"
-                    v-on:click="showFlywireConfig = false; showCurrentConfig = !showCurrentConfig">
-                    <i class="material-icons">settings</i>
-                </a>
+            <a class="btn-floating btn-large waves-effect waves-light blue lighten-1"
+                v-on:click="showFlywireConfig = false; showCurrentConfig = !showCurrentConfig">
+                <i class="material-icons">settings</i>
+            </a>
             <ul>
                 <li>
-                    <a class="btn-floating waves-effect waves-light red lighten-1"
-                        v-on:click="clear()">
+                    <a class="btn-floating waves-effect waves-light red lighten-1" v-on:click="clear()">
                         <i class="material-icons">delete</i>
                     </a>
                 </li>
                 <li>
-                    <a class="btn-floating waves-effect waves-light green lighten-1"
-                        v-on:click="save()">
+                    <a class="btn-floating waves-effect waves-light green lighten-1" v-on:click="save()">
                         <i class="material-icons">share</i>
                     </a>
                 </li>
             </ul>
         </div>
     </div>
-    
+
 
     <script src="assets/vue.2.6.10.js"></script>
     <script src="assets/materialize.min.js"></script>
@@ -575,7 +606,7 @@
         });
 
         var currencies = [
-            
+
             { code: "EUR", symbol: "€" },
             { code: "GBP", symbol: "£" },
             { code: "JPY", symbol: "¥" },
@@ -584,7 +615,7 @@
         ];
 
     </script>
-    
+
     <script src="assets/flywire.js"></script>
 </body>
 

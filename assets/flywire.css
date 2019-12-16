@@ -166,20 +166,14 @@ h4, h5 {
 .fees {
     white-space: nowrap;
 }
-.total {
+.total, .sub-total {
     font-size: 1.5em;
 }
-.sub-total {
-    font-size: 1.5em;
-}
-.fees-total {
+.fees-total, .rates, .content {
     font-size: 0.75em;
 }
 .saving {
     font-size: 1rem;
-}
-.rates {
-    font-size: 0.75em;
 }
 
 .arrows {
