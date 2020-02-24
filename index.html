@@ -35,29 +35,6 @@
                                                 </label>
                                             </div>
                                         </li>
-                                        <!-- <li>
-                                            <label>Show Savings</label>
-                                            <div class="switch">
-                                                <label>
-                                                    No
-                                                    <input type="checkbox" v-model="showSavings"
-                                                        v-bind:disabled="!enableFlywire">
-                                                    <span class="lever"></span>
-                                                    Yes
-                                                </label>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <label>Show Rates</label>
-                                            <div class="switch">
-                                                <label>
-                                                    No
-                                                    <input type="checkbox" v-model="showRates">
-                                                    <span class="lever"></span>
-                                                    Yes
-                                                </label>
-                                            </div>
-                                        </li> -->
                                         <li>
                                             <label>Simple View</label>
                                             <div class="switch">
@@ -98,7 +75,8 @@
                                         {{ merchantName }}
                                     </div>
                                     <div>
-                                        <i class="material-icons medium">business</i>
+                                        <img v-if="merchantLogoUrl" v-bind:src="merchantLogoUrl"></img>
+                                        <i v-else class="material-icons medium">business</i>
                                     </div>
                                     <div class="slide-down amount">
                                         <div v-bind:class="{ show: !enableFlywire }">
@@ -367,6 +345,10 @@
                                             <input id="merchantName" type="text" v-model="merchantName"
                                                 maxlength="50" />
                                             <label for="merchantName">Client Name</label>
+                                        </div>
+                                        <div class="input-field col s8">
+                                            <input id="merchantLogoUrl" type="text" v-model="merchantLogoUrl" maxlength="1024" />
+                                            <label for="merchantLogoUrl">Client Logo URL</label>
                                         </div>
                                     </div>
                                 </div>

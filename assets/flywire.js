@@ -15,6 +15,7 @@ var vm = new Vue({
         growthRaw: 1,
 
         merchantName: 'The ABC Wine Co.',
+        merchantLogoUrl: '',
         ccy: currencies[0],
         amountRaw: 1000000,
         numberOfTransactions: 5000,
@@ -188,6 +189,7 @@ var vm = new Vue({
             this.growthRaw =        parseFloat(this.getQueryStringValue('g') || '1');
 
             this.merchantName =         decodeURIComponent(this.getQueryStringValue('mn') || 'The ABC Wine Company');
+            this.merchantLogoUrl =      decodeURIComponent(this.getQueryStringValue('ml') || '');
             this.ccy =                  this.getCurrency(this.getQueryStringValue('ccy') || 'USD');
             this.amountRaw =            parseFloat(this.getQueryStringValue('a') || '1000000');
             this.numberOfTransactions = parseInt(this.getQueryStringValue('not') || '1000');
@@ -223,6 +225,7 @@ var vm = new Vue({
                 '&g=' + this.growthRaw +
 
                 '&mn=' + encodeURIComponent(this.merchantName) +
+                '&ml=' + encodeURIComponent(this.merchantLogoUrl) +
                 '&ccy=' + this.ccy.code +
                 '&a=' + this.amountRaw +
                 '&not=' + this.numberOfTransactions +
